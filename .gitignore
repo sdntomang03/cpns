@@ -1,0 +1,48 @@
+# Installed dependencies
+**/node_modules/
+**/vendor/
+
+# Generated build output and caches
+**/dist/
+**/dist-ssr/
+**/coverage/
+**/.vite/
+**/*.tsbuildinfo
+**/.phpunit.cache/
+**/.phpunit.result.cache
+**/.oxlint-cache/
+backend/public/build/
+backend/public/hot
+frontend/android/.gradle/
+frontend/android/**/build/
+
+# Local environment and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/auth.json
+postman/*.local.postman_environment.json
+backend/storage/app/firebase/service-account.json
+frontend/android/local.properties
+frontend/android/key.properties
+frontend/android/app/google-services.json
+**/*.keystore
+**/*.jks
+
+# Local databases and runtime data
+**/*.sqlite
+**/*.sqlite-*
+backend/storage/logs/*.log
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,8 @@
+{
+  "appId": "com.cpnsnasionals.app",
+  "appName": "CPNS Nasional",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

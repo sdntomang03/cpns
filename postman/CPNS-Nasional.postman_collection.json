@@ -1,0 +1,495 @@
+{
+  "info": {
+    "_postman_id": "2bb790a0-ae77-4a57-9b03-44fd016796ca",
+    "name": "CPNS Nasional API",
+    "description": "Auth, profile, materi, latihan, berita, dan notifikasi CPNS.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8012/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "materialId",
+      "value": "1"
+    },
+    {
+      "key": "updatedSince",
+      "value": "2020-01-01T00:00:00Z"
+    },
+    {
+      "key": "practicePackageId",
+      "value": "1"
+    },
+    {
+      "key": "practiceAnswers",
+      "value": "[]"
+    },
+    {
+      "key": "tryoutId",
+      "value": ""
+    },
+    {
+      "key": "tryoutAttemptId",
+      "value": ""
+    },
+    {
+      "key": "tryoutQuestionId",
+      "value": ""
+    },
+    {
+      "key": "tryoutOptionId",
+      "value": ""
+    },
+    {
+      "key": "newsSlug",
+      "value": "persiapan-seleksi-cpns"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Peserta CPNS\",\n  \"email\": \"peserta.postman@example.com\",\n  \"phone\": \"081234567890\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"institution\": \"\",\n  \"target_position\": \"Analis Kebijakan\",\n  \"province\": \"DKI Jakarta\",\n  \"city\": \"Jakarta Selatan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login (saves bearer token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 && pm.response.json().data?.token) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().data.token);",
+                  "  pm.environment.set('token', pm.response.json().data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"peserta.postman@example.com\",\n  \"password\": \"Password123!\",\n  \"remember\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get my profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Update my profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"081234567890\",\n  \"province\": \"DKI Jakarta\",\n  \"city\": \"Jakarta Selatan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Materials",
+      "item": [
+        {
+          "name": "List published materials",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/materials?per_page=20&page=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["materials"],
+              "query": [
+                { "key": "per_page", "value": "20" },
+                { "key": "page", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter materials by category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/materials?category=tiu",
+              "host": ["{{baseUrl}}"],
+              "path": ["materials"],
+              "query": [{ "key": "category", "value": "tiu" }]
+            }
+          }
+        },
+        {
+          "name": "Incremental sync (includes delete/unpublish events)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/materials?updated_since={{updatedSince}}&per_page=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["materials"],
+              "query": [
+                { "key": "updated_since", "value": "{{updatedSince}}" },
+                { "key": "per_page", "value": "100" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get material by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/materials/{{materialId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["materials", "{{materialId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Practice",
+      "item": [
+        {
+          "name": "List practice packages (prepare all-correct answers)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const practicePackage = pm.response.json().data?.[0];",
+                  "if (practicePackage) {",
+                  "  pm.collectionVariables.set('practicePackageId', practicePackage.id);",
+                  "  pm.collectionVariables.set('practiceAnswers', JSON.stringify(practicePackage.questions.map((question) => ({ question_id: question.id, option_id: question.options.find((option) => option.is_correct)?.id }))));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/practice/packages",
+              "host": ["{{baseUrl}}"],
+              "path": ["practice", "packages"]
+            }
+          }
+        },
+        {
+          "name": "Submit practice answers (all correct)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {{practiceAnswers}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/practice/packages/{{practicePackageId}}/result",
+              "host": ["{{baseUrl}}"],
+              "path": ["practice", "packages", "{{practicePackageId}}", "result"]
+            }
+          }
+        },
+        {
+          "name": "Sync practice progress (statistics only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attempts\": [\n    {\n      \"uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"package_slug\": \"twk-paket-1\",\n      \"category\": \"twk\",\n      \"package_title\": \"TWK Paket 1\",\n      \"score\": 20,\n      \"max_score\": 25,\n      \"passing_score\": 11,\n      \"correct_count\": 4,\n      \"wrong_count\": 1,\n      \"unanswered_count\": 0,\n      \"completed_at\": \"2026-10-07T12:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/practice/progress/sync",
+              "host": ["{{baseUrl}}"],
+              "path": ["practice", "progress", "sync"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Try Out",
+      "item": [
+        {
+          "name": "List server Try Outs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const tryout = pm.response.json().data?.[0];",
+                  "if (tryout) pm.collectionVariables.set('tryoutId', tryout.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tryouts",
+              "host": ["{{baseUrl}}"],
+              "path": ["tryouts"]
+            }
+          }
+        },
+        {
+          "name": "Start Try Out",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json().data;",
+                  "if (data) {",
+                  "  pm.collectionVariables.set('tryoutAttemptId', data.attempt_id);",
+                  "  const question = data.tryout?.sections?.[0]?.questions?.[0];",
+                  "  if (question) {",
+                  "    pm.collectionVariables.set('tryoutQuestionId', question.id);",
+                  "    pm.collectionVariables.set('tryoutOptionId', question.options?.[0]?.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/tryouts/{{tryoutId}}/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["tryouts", "{{tryoutId}}", "start"]
+            }
+          }
+        },
+        {
+          "name": "Save one answer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_id\": {{tryoutQuestionId}},\n  \"option_id\": {{tryoutOptionId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tryout-attempts/{{tryoutAttemptId}}/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["tryout-attempts", "{{tryoutAttemptId}}", "answer"]
+            }
+          }
+        },
+        {
+          "name": "Submit Try Out",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/tryout-attempts/{{tryoutAttemptId}}/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["tryout-attempts", "{{tryoutAttemptId}}", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Try Out result",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tryout-attempts/{{tryoutAttemptId}}/result",
+              "host": ["{{baseUrl}}"],
+              "path": ["tryout-attempts", "{{tryoutAttemptId}}", "result"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard and ranking",
+      "item": [
+        {
+          "name": "Get dashboard server summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Get national ranking",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ranking/national",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranking", "national"]
+            }
+          }
+        },
+        {
+          "name": "Get my national ranking",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/ranking/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranking", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "News and notifications (admin endpoints require an admin token)",
+      "item": [
+        {
+          "name": "List published news",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/news",
+              "host": ["{{baseUrl}}"],
+              "path": ["news"]
+            }
+          }
+        },
+        {
+          "name": "Get news detail",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/news/{{newsSlug}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["news", "{{newsSlug}}"]
+            }
+          }
+        },
+        {
+          "name": "Create and publish news (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pengumuman Seleksi CPNS\",\n  \"summary\": \"Informasi terbaru untuk peserta.\",\n  \"content\": \"Periksa situs resmi instansi untuk informasi lengkap.\",\n  \"is_published\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/news",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "news"]
+            }
+          }
+        },
+        {
+          "name": "Upload image with a news article (admin)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Informasi Seleksi CPNS", "type": "text" },
+                { "key": "summary", "value": "Informasi terbaru untuk peserta.", "type": "text" },
+                { "key": "content", "value": "Periksa situs resmi instansi untuk informasi lengkap.", "type": "text" },
+                { "key": "is_published", "value": "true", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/news",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "news"]
+            }
+          }
+        },
+        {
+          "name": "Broadcast FCM notification (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Informasi CPNS\",\n  \"body\": \"Berita terbaru sudah tersedia.\",\n  \"url\": \"/news/persiapan-seleksi-cpns\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/notifications/broadcast",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "notifications", "broadcast"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
